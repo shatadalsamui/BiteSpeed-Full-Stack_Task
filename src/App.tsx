@@ -98,6 +98,13 @@ function App() {
     setSelectedNode(prev => prev ? { ...prev, data: { ...prev.data, label: text } } : null);
   };
 
+  // Delete node and its edges
+  const onDeleteNode = (nodeId: string) => {
+    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+    setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+    setSelectedNode(null);
+  };
+
   return (
     <div className="w-screen h-screen flex flex-col">
       <Header nodes={nodes} edges={edges} />
@@ -116,6 +123,7 @@ function App() {
           onDragOver={onDragOver}
           updateNodeText={updateNodeText}
           reactFlowWrapper={reactFlowWrapper}
+          onDeleteNode={onDeleteNode}
         />
       </ReactFlowProvider>
     </div>
@@ -138,11 +146,12 @@ type DropFlowProps = {
   onDragOver: (event: React.DragEvent) => void;
   updateNodeText: (nodeId: string, text: string) => void;
   reactFlowWrapper: React.RefObject<HTMLDivElement | null>;
+  onDeleteNode?: (nodeId: string) => void;
 };
 
 function DropFlow(props: DropFlowProps) {
   const { project } = useReactFlow();
-  const { setNodes, reactFlowWrapper, edges, setEdges } = props;
+  const { setNodes, reactFlowWrapper, edges, setEdges, setSelectedNode, nodes } = props;
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
@@ -187,6 +196,18 @@ function DropFlow(props: DropFlowProps) {
     },
     [edges, setEdges]
   );
+
+  // Use onSelectionChange to update selectedNode for one-click editing
+  const onSelectionChange = useCallback((params: { nodes: Node[] }) => {
+    if (params.nodes.length > 0) {
+      // Find the full node object from the current nodes array
+      const node = nodes.find(n => n.id === params.nodes[0].id);
+      setSelectedNode(node || null);
+    } else {
+      setSelectedNode(null);
+    }
+  }, [setSelectedNode, nodes]);
+
   return (
     <div className="flex flex-grow">
       <main className="flex-grow h-full" ref={props.reactFlowWrapper}>
@@ -196,12 +217,12 @@ function DropFlow(props: DropFlowProps) {
           onNodesChange={props.onNodesChange}
           onEdgesChange={props.onEdgesChange}
           onConnect={onConnect}
-          onNodeClick={props.onNodeClick}
           onPaneClick={props.onPaneClick}
           onDragOver={props.onDragOver}
           onDrop={onDrop}
           nodeTypes={nodeTypes}
           fitView
+          onSelectionChange={onSelectionChange}
         >
           <Background />
           <Controls />
@@ -211,6 +232,7 @@ function DropFlow(props: DropFlowProps) {
         selectedNode={props.selectedNode}
         updateNodeText={props.updateNodeText}
         setSelectedNode={props.setSelectedNode}
+        onDeleteNode={props.onDeleteNode}
       />
     </div>
   );

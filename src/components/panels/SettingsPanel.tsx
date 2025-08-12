@@ -4,9 +4,10 @@ type SettingsPanelProps = {
   value: string;
   onChange: (value: string) => void;
   onBack: () => void;
+  onDelete?: () => void;
 };
 
-export const SettingsPanel: React.FC<SettingsPanelProps> = ({ value, onChange, onBack }) => {
+export const SettingsPanel: React.FC<SettingsPanelProps> = ({ value, onChange, onBack, onDelete }) => {
   return (
     <div className="p-4 flex flex-col gap-4">
       <button onClick={onBack} className="text-blue-600 hover:underline self-start">
@@ -20,6 +21,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ value, onChange, o
         value={value}
         onChange={e => onChange(e.target.value)}
       />
+      {onDelete && (
+        <button
+          onClick={onDelete}
+          className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-2"
+        >
+          Delete Node
+        </button>
+      )}
     </div>
   );
 };
