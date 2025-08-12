@@ -1,43 +1,49 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# BiteSpeed Full Stack Task
 
-Currently, two official plugins are available:
+This project is a simple flow builder using React, TypeScript, Vite, and React Flow. You can add message nodes by dragging and dropping, edit their text, and connect them visually.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## How to Add a Message Node
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Open the app in your browser.**
+2. Go to the right sidebar and find the "Nodes Panel".
+3. Click and hold the **Message** node (✉️), then drag it onto the main canvas area and release to drop it.
+4. The new message node will appear where you dropped it.
+5. Click any node to edit its text or delete it from the sidebar.
+6. To connect nodes, drag from the small circle (handle) on the right side of one node to the left side of another node.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Features Used
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **React** + **TypeScript** + **Vite**
+- **React Flow** for drag-and-drop node-based UI
+- **Tailwind CSS** for styling
+- **react-icons** for icons
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Folder Structure (Key Parts)
+
 ```
+src/
+  App.tsx                # Main app logic and flow rendering
+  components/
+    Header.tsx           # Save button and validation
+    nodes/
+      TextMessageNode.tsx  # Message node UI
+      node-styles.css      # Node styles
+    panels/
+      NodesPanel.tsx     # Sidebar panel for draggable nodes
+      Sidebar.tsx        # Main sidebar logic (switches between panels)
+      SettingsPanel.tsx  # Edit/delete node UI
+```
+
+## Quick Start
+
+```bash
+npm install
+npm run dev
+```
+
+Open the app at the local URL shown in your terminal.
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 

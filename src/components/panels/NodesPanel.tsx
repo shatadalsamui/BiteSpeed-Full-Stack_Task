@@ -16,7 +16,8 @@ export const NodesPanel = () => {
         draggable
       >
         <div className="text-blue-500 mb-2 text-2xl">✉️</div>
-        <div className="text-blue-500 text-sm">Message</div>
+        <div className="text-blue-500 text-lg">New Message</div>
+        <div className="text-black text-sm">(Drag and drop)</div>
       </div>
     </div>
   );
