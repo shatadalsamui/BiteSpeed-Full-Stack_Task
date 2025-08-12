@@ -1,4 +1,3 @@
-// src/components/Panels/Sidebar.tsx
 import React from 'react';
 import { NodesPanel } from './NodesPanel';
 
