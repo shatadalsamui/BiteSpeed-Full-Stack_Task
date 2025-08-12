@@ -4,9 +4,10 @@ import type { Node, Edge } from 'reactflow';
 type HeaderProps = {
   nodes: Node[];
   edges: Edge[];
+  setErrorMessage: (msg: string | null) => void;
 };
 
-export const Header = ({ nodes, edges }: HeaderProps) => {
+export const Header = ({ nodes, edges, setErrorMessage }: HeaderProps) => {
   // This function contains the save validation logic
   const onSave = () => {
     // 1. Get all node IDs that are a target of an edge
@@ -17,9 +18,10 @@ export const Header = ({ nodes, edges }: HeaderProps) => {
 
     // 3. Check the validation condition
     if (nodes.length > 1 && nodesWithEmptyTargets.length > 1) {
-      alert('Error: Cannot save Flow. More than one node has an empty target handle.');
+      setErrorMessage('Error: Cannot save Flow. More than one node has an empty target handle.');
     } else {
-      alert('Success: Flow saved!');
+      setErrorMessage(null);
+      // Optionally, you can show a green box for success, or just log
       console.log('Saved Flow:', { nodes, edges });
     }
   };

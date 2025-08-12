@@ -62,6 +62,7 @@ function App() {
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -107,7 +108,13 @@ function App() {
 
   return (
     <div className="w-screen h-screen flex flex-col">
-      <Header nodes={nodes} edges={edges} />
+      <Header nodes={nodes} edges={edges} setErrorMessage={setErrorMessage} />
+      {errorMessage && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 text-center font-semibold">
+          {errorMessage}
+          <button className="ml-4 text-red-700 underline" onClick={() => setErrorMessage(null)}>Dismiss</button>
+        </div>
+      )}
       <ReactFlowProvider>
         <DropFlow
           nodes={nodes}
@@ -124,6 +131,7 @@ function App() {
           updateNodeText={updateNodeText}
           reactFlowWrapper={reactFlowWrapper}
           onDeleteNode={onDeleteNode}
+          setErrorMessage={setErrorMessage}
         />
       </ReactFlowProvider>
     </div>
@@ -147,11 +155,12 @@ type DropFlowProps = {
   updateNodeText: (nodeId: string, text: string) => void;
   reactFlowWrapper: React.RefObject<HTMLDivElement | null>;
   onDeleteNode?: (nodeId: string) => void;
+  setErrorMessage: (msg: string | null) => void;
 };
 
 function DropFlow(props: DropFlowProps) {
   const { project } = useReactFlow();
-  const { setNodes, reactFlowWrapper, edges, setEdges, setSelectedNode, nodes } = props;
+  const { setNodes, reactFlowWrapper, edges, setEdges, setSelectedNode, nodes, setErrorMessage } = props;
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
@@ -169,23 +178,24 @@ function DropFlow(props: DropFlowProps) {
         data: { label: `New Message` },
       };
       setNodes((nds) => nds.concat(newNode));
+      setErrorMessage(null); // clear error on successful drop
     },
-    [setNodes, project, reactFlowWrapper]
+    [setNodes, project, reactFlowWrapper, setErrorMessage]
   );
   const onConnect = useCallback(
     (connection: Connection) => {
       if (connection.source === connection.target) {
-        alert("Error: Cannot connect a node to itself.");
+        setErrorMessage("Error: Cannot connect a node to itself.");
         return;
       }
       const sourceHasEdge = edges.some(edge => edge.source === connection.source && edge.sourceHandle === connection.sourceHandle);
       if (sourceHasEdge) {
-        alert("Error: A source handle can only have one outgoing connection.");
+        setErrorMessage("Error: A source handle can only have one outgoing connection.");
         return;
       }
 
       if (wouldCreateCycle(edges, connection.source!, connection.target!)) {
-        alert("Error: This connection would create a cycle in the flow.");
+        setErrorMessage("Error: This connection would create a cycle in the flow.");
         return;
       }
       setEdges((eds) => addEdge({
@@ -193,8 +203,9 @@ function DropFlow(props: DropFlowProps) {
         type: 'default',
         markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 }
       }, eds));
+      setErrorMessage(null); // clear error on successful connect
     },
-    [edges, setEdges]
+    [edges, setEdges, setErrorMessage]
   );
 
   // Use onSelectionChange to update selectedNode for one-click editing
