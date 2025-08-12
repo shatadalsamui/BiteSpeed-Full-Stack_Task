@@ -137,7 +137,7 @@ type DropFlowProps = {
   onPaneClick: () => void;
   onDragOver: (event: React.DragEvent) => void;
   updateNodeText: (nodeId: string, text: string) => void;
-  reactFlowWrapper: React.RefObject<HTMLDivElement>;
+  reactFlowWrapper: React.RefObject<HTMLDivElement | null>;
 };
 
 function DropFlow(props: DropFlowProps) {
