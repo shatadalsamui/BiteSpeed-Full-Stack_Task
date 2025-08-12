@@ -142,10 +142,11 @@ type DropFlowProps = {
 
 function DropFlow(props: DropFlowProps) {
   const { project } = useReactFlow();
+  const { setNodes, reactFlowWrapper, edges, setEdges } = props;
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-      const reactFlowBounds = props.reactFlowWrapper.current!.getBoundingClientRect();
+      const reactFlowBounds = reactFlowWrapper.current!.getBoundingClientRect();
       const type = event.dataTransfer.getData('application/reactflow');
       if (typeof type === 'undefined' || !type) return;
       const position = project({
@@ -158,9 +159,9 @@ function DropFlow(props: DropFlowProps) {
         position,
         data: { label: `New Message` },
       };
-      props.setNodes((nds) => nds.concat(newNode));
+      setNodes((nds) => nds.concat(newNode));
     },
-    [props.setNodes, project, props.reactFlowWrapper]
+    [setNodes, project, reactFlowWrapper]
   );
   const onConnect = useCallback(
     (connection: Connection) => {
@@ -168,23 +169,23 @@ function DropFlow(props: DropFlowProps) {
         alert("Error: Cannot connect a node to itself.");
         return;
       }
-      const sourceHasEdge = props.edges.some(edge => edge.source === connection.source && edge.sourceHandle === connection.sourceHandle);
+      const sourceHasEdge = edges.some(edge => edge.source === connection.source && edge.sourceHandle === connection.sourceHandle);
       if (sourceHasEdge) {
         alert("Error: A source handle can only have one outgoing connection.");
         return;
       }
 
-      if (wouldCreateCycle(props.edges, connection.source!, connection.target!)) {
+      if (wouldCreateCycle(edges, connection.source!, connection.target!)) {
         alert("Error: This connection would create a cycle in the flow.");
         return;
       }
-      props.setEdges((eds) => addEdge({
+      setEdges((eds) => addEdge({
         ...connection,
         type: 'default',
         markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 }
       }, eds));
     },
-    [props.edges, props.setEdges]
+    [edges, setEdges]
   );
   return (
     <div className="flex flex-grow">

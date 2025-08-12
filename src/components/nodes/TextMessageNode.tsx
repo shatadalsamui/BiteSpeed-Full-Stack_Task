@@ -1,16 +1,9 @@
-// src/components/Nodes/TextMessageNode.tsx
-import React from 'react';
 import { Handle, Position } from 'reactflow';
-import type { Node } from 'reactflow';
+import type { NodeProps } from 'reactflow';
 import './node-styles.css';
 import { FaWhatsapp } from 'react-icons/fa';
 
-
-
-
-type TextMessageNodeProps = Node;
-
-export const TextMessageNode = (props: any) => {
+export const TextMessageNode = (props: NodeProps) => {
   const { data, selected } = props;
   return (
     <div className={`text-message-node ${selected ? 'selected' : ''}`}>
