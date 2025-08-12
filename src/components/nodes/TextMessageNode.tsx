@@ -1,6 +1,7 @@
 // src/components/Nodes/TextMessageNode.tsx
 import React from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position } from 'reactflow';
+import type { Node } from 'reactflow';
 import './node-styles.css';
 
 // A simple component to display a WhatsApp icon
@@ -11,9 +12,13 @@ const WhatsAppIcon = () => (
     </svg>
 );
 
-export const TextMessageNode: React.FC<NodeProps> = ({ data, isSelected }) => {
+
+type TextMessageNodeProps = Node;
+
+export const TextMessageNode = (props: any) => {
+  const { data, selected } = props;
   return (
-    <div className={`text-message-node ${isSelected ? 'selected' : ''}`}>
+    <div className={`text-message-node ${selected ? 'selected' : ''}`}>
       <Handle
         type="target"
         position={Position.Left}

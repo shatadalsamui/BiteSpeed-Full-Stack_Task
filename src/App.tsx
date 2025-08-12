@@ -1,24 +1,21 @@
 // src/App.tsx
+// src/App.tsx
 import { useState, useRef, useCallback } from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     Background,
     Controls,
-    Node,
-    Edge,
     addEdge,
     applyNodeChanges,
     applyEdgeChanges,
-    NodeChange,
-    EdgeChange,
-    Connection,
 } from 'reactflow';
+import type { Node, Edge, NodeChange, EdgeChange, Connection } from 'reactflow';
 import { v4 as uuidv4 } from 'uuid';
 import 'reactflow/dist/style.css';
 
 import { Header } from './components/Header';
-import { Sidebar } from './components/Panels/Sidebar';
-import { TextMessageNode } from './components/Nodes/TextMessageNode';
+import { Sidebar } from './components/panels/Sidebar';
+import { TextMessageNode } from './components/nodes/TextMessageNode';
 
 const nodeTypes = {
     textMessage: TextMessageNode,
@@ -51,9 +48,15 @@ function App() {
 
     const onConnect = useCallback(
         (connection: Connection) => {
+            // **RULE: A source handle can only have one outgoing edge.**
+            const sourceHasEdge = edges.some(edge => edge.source === connection.source && edge.sourceHandle === connection.sourceHandle);
+            if (sourceHasEdge) {
+                alert("Error: A source handle can only have one outgoing connection.");
+                return;
+            }
             setEdges((eds) => addEdge(connection, eds));
         },
-        [setEdges]
+        [edges] // We need 'edges' in the dependency array to check the current edges
     );
 
     const onNodeClick = (_: React.MouseEvent, node: Node) => {
@@ -75,9 +78,7 @@ function App() {
             const reactFlowBounds = reactFlowWrapper.current!.getBoundingClientRect();
             const type = event.dataTransfer.getData('application/reactflow');
 
-            if (typeof type === 'undefined' || !type) {
-                return;
-            }
+            if (typeof type === 'undefined' || !type) return;
 
             const position = {
                 x: event.clientX - reactFlowBounds.left,
@@ -88,7 +89,7 @@ function App() {
                 id: uuidv4(),
                 type,
                 position,
-                data: { label: `text message` },
+                data: { label: `New Message` },
             };
 
             setNodes((nds) => nds.concat(newNode));
@@ -96,7 +97,6 @@ function App() {
         [setNodes]
     );
     
-    // This function will be passed to the settings panel
     const updateNodeText = (nodeId: string, text: string) => {
         setNodes((nds) =>
           nds.map((node) => {
@@ -106,7 +106,6 @@ function App() {
             return node;
           })
         );
-        // Also update the selected node's data
         setSelectedNode(prev => prev ? {...prev, data: {...prev.data, label: text}} : null);
       };
 

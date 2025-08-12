@@ -1,10 +1,28 @@
-import React from 'react';
+import type { Node } from 'reactflow';
 import { NodesPanel } from './NodesPanel';
+import { SettingsPanel } from './SettingsPanel';
 
-export const Sidebar = () => {
+// Define the props the Sidebar will receive from App.tsx
+type SidebarProps = {
+  selectedNode: Node | null;
+  updateNodeText: (nodeId: string, text: string) => void;
+  setSelectedNode: (node: Node | null) => void;
+};
+
+export const Sidebar = ({ selectedNode, updateNodeText, setSelectedNode }: SidebarProps) => {
   return (
     <aside className="w-80 bg-gray-50 border-l border-gray-200">
-      <NodesPanel />
+      {/* If a node is selected, show the SettingsPanel */}
+      {selectedNode ? (
+        <SettingsPanel
+          value={selectedNode.data.label || ''}
+          onChange={(newText) => updateNodeText(selectedNode.id, newText)}
+          onBack={() => setSelectedNode(null)}
+        />
+      ) : (
+        /* Otherwise, show the NodesPanel */
+        <NodesPanel />
+      )}
     </aside>
   );
 };
