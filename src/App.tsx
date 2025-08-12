@@ -8,6 +8,7 @@ import ReactFlow, {
     addEdge,
     applyNodeChanges,
     applyEdgeChanges,
+    MarkerType,
 } from 'reactflow';
 import type { Node, Edge, NodeChange, EdgeChange, Connection } from 'reactflow';
 import { v4 as uuidv4 } from 'uuid';
@@ -54,9 +55,14 @@ function App() {
                 alert("Error: A source handle can only have one outgoing connection.");
                 return;
             }
-            setEdges((eds) => addEdge(connection, eds));
+            // Use MarkerType.ArrowClosed for markerEnd
+            setEdges((eds) => addEdge({
+                ...connection,
+                type: 'default',
+                markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 }
+            }, eds));
         },
-        [edges] // We need 'edges' in the dependency array to check the current edges
+        [edges]
     );
 
     const onNodeClick = (_: React.MouseEvent, node: Node) => {
