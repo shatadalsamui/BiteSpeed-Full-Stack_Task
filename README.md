@@ -1,32 +1,34 @@
 
-# BiteSpeed Full Stack Task
 
-This project is a simple flow builder using React, TypeScript, Vite, and React Flow. You can add message nodes by dragging and dropping, edit their text, and connect them visually.
+# Full Stack Task BiteSpeed — Shatadal Samui
 
-## How to Add a Message Node
+**Assessment project for job application | [shatadalsamuimain@gmail.com](mailto:shatadalsamuimain@gmail.com)**
 
+This is a visual message flow builder built with React, TypeScript, Vite, and React Flow. Drag and drop message nodes, connect them, and edit their content in a modern UI.
+
+## How to Use
 
 1. **Open the app in your browser.**
-2. Go to the right sidebar and find the "Nodes Panel".
-3. Click and hold the **Message** node (✉️), then drag it onto the main canvas area and release to drop it.
-4. The new message node will appear where you dropped it.
-5. Click any node to edit its text or delete it from the sidebar.
-6. To connect nodes, drag from the small circle (handle) on the right side of one node to the left side of another node.
+2. In the right sidebar (Nodes Panel), drag the **Message** node (✉️) onto the canvas.
+3. Drop it anywhere to add a new message node.
+4. Click a node to edit its text or delete it (see sidebar).
+5. Connect nodes by dragging from the right handle of one node to the left handle of another.
+6. The UI prevents self-loops and cycles for logical flows.
 
-## Features Used
+## Tech Stack
 
 - **React** + **TypeScript** + **Vite**
-- **React Flow** for drag-and-drop node-based UI
-- **Tailwind CSS** for styling
-- **react-icons** for icons
+- **React Flow** (visual node-based editor)
+- **Tailwind CSS** (styling)
+- **react-icons** (icons)
 
 ## Folder Structure (Key Parts)
 
-```
+```tsx
 src/
   App.tsx                # Main app logic and flow rendering
   components/
-    Header.tsx           # Save button and validation
+    Header.tsx           # Top bar with title and save button
     nodes/
       TextMessageNode.tsx  # Message node UI
       node-styles.css      # Node styles
@@ -36,6 +38,7 @@ src/
       SettingsPanel.tsx  # Edit/delete node UI
 ```
 
+
 ## Quick Start
 
 ```bash
@@ -43,5 +46,5 @@ npm install
 npm run dev
 ```
 
-Open the app at the local URL shown in your terminal.
+Then open the app at the local URL shown in your terminal.
 
