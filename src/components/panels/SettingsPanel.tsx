@@ -1,5 +1,5 @@
 import React from 'react';
-
+//settings panel open when u select a message node
 type SettingsPanelProps = {
   value: string;
   onChange: (value: string) => void;

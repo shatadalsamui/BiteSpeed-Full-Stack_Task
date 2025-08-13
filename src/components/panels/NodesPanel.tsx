@@ -1,10 +1,10 @@
-// src/components/Panels/NodesPanel.tsx
 import React from 'react';
 
+//drag and drop feature for adding a message node
 export const NodesPanel = () => {
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
-    event.dataTransfer.setData('application/reactflow', nodeType);
-    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('application/reactflow', nodeType); //to identify node drags 
+    event.dataTransfer.effectAllowed = 'move'; // tell the browser to show holding animation of the message node 
   };
 
   return (

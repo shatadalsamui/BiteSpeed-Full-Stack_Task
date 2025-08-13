@@ -29,7 +29,18 @@ export const Header = ({ nodes, edges, setErrorMessage, setSuccessMessage }: Hea
   };
 
   return (
-    <header className="bg-gray-100 p-3 border-b border-gray-200 flex justify-end">
+    <header className="bg-gray-100 p-3 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <span className="text-lg font-semibold text-gray-700 text-left">
+          Full Stack Task BiteSpeed &mdash; Shatadal Samui
+          <br/>
+          <span className="text-sm font-medium text-gray-500">
+            Assessment project for job application
+            <span className="mx-2 text-gray-300">|</span>
+            <span className="text-gray-400 text-sm font-medium">shatadalsamuimain@gmail.com</span>
+          </span>
+        </span>
+      </div>
       <button
         onClick={onSave}
         className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"

@@ -1,26 +1,11 @@
 import { useState, useRef, useCallback } from 'react';
-import { useReactFlow } from 'reactflow';
-import ReactFlow, {
-  ReactFlowProvider,
-  Background,
-  Controls,
-  addEdge,
-  applyNodeChanges,
-  applyEdgeChanges,
-  MarkerType,
-} from 'reactflow';
-import type { Node, Edge, NodeChange, EdgeChange, Connection } from 'reactflow';
-import { v4 as uuidv4 } from 'uuid';
+import { ReactFlowProvider, applyNodeChanges, applyEdgeChanges } from 'reactflow';
+import type { Node, Edge, NodeChange, EdgeChange } from 'reactflow';
 import 'reactflow/dist/style.css';
-
 import { Header } from './components/Header';
-import { Sidebar } from './components/panels/Sidebar';
-import { TextMessageNode } from './components/nodes/TextMessageNode';
+import DropFlow from './components/DropFlow';
 
-const nodeTypes = {
-  textMessage: TextMessageNode,
-};
-
+//default message node
 const initialNodes: Node[] = [
   {
     id: '1',
@@ -29,33 +14,6 @@ const initialNodes: Node[] = [
     data: { label: 'Test message 1' },
   },
 ];
-
-// --- Cycle detection helper ---
-// Returns true if adding an edge from source to target would create a cycle
-function wouldCreateCycle(edges: Edge[], source: string, target: string): boolean {
-  // Build adjacency list
-  const adj: Record<string, string[]> = {};
-  edges.forEach(edge => {
-    if (!adj[edge.source]) adj[edge.source] = [];
-    adj[edge.source].push(edge.target);
-  });
-  // Add the new edge
-  if (!adj[source]) adj[source] = [];
-  adj[source].push(target);
-  // DFS to check for cycle
-  const visited = new Set<string>();
-  function dfs(node: string): boolean {
-    if (visited.has(node)) return true;
-    visited.add(node);
-    const neighbors = adj[node] || [];
-    for (const neighbor of neighbors) {
-      if (dfs(neighbor)) return true;
-    }
-    visited.delete(node);
-    return false;
-  }
-  return dfs(source);
-}
 
 function App() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -88,6 +46,7 @@ function App() {
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
+  //update message node's text
   const updateNodeText = (nodeId: string, text: string) => {
     setNodes((nds) =>
       nds.map((node) => {
@@ -141,117 +100,6 @@ function App() {
           setErrorMessage={setErrorMessage}
         />
       </ReactFlowProvider>
-    </div>
-  );
-}
-// Child component to use useReactFlow inside ReactFlowProvider
-import React from 'react';
-import type { Dispatch, SetStateAction } from 'react';
-type DropFlowProps = {
-  nodes: Node[];
-  setNodes: Dispatch<SetStateAction<Node[]>>;
-  edges: Edge[];
-  setEdges: Dispatch<SetStateAction<Edge[]>>;
-  selectedNode: Node | null;
-  setSelectedNode: Dispatch<SetStateAction<Node | null>>;
-  onNodesChange: (changes: NodeChange[]) => void;
-  onEdgesChange: (changes: EdgeChange[]) => void;
-  onNodeClick: (_: React.MouseEvent, node: Node) => void;
-  onPaneClick: () => void;
-  onDragOver: (event: React.DragEvent) => void;
-  updateNodeText: (nodeId: string, text: string) => void;
-  reactFlowWrapper: React.RefObject<HTMLDivElement | null>;
-  onDeleteNode?: (nodeId: string) => void;
-  setErrorMessage: (msg: string | null) => void;
-};
-
-function DropFlow(props: DropFlowProps) {
-  const { project } = useReactFlow();
-  const { setNodes, reactFlowWrapper, edges, setEdges, setSelectedNode, nodes, setErrorMessage } = props;
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
-      const reactFlowBounds = reactFlowWrapper.current!.getBoundingClientRect();
-      const type = event.dataTransfer.getData('application/reactflow');
-      if (typeof type === 'undefined' || !type) return;
-      const position = project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      });
-      const newNode: Node = {
-        id: uuidv4(),
-        type,
-        position,
-        data: { label: `New Message` },
-      };
-      setNodes((nds) => nds.concat(newNode));
-      setErrorMessage(null); // clear error on successful drop
-    },
-    [setNodes, project, reactFlowWrapper, setErrorMessage]
-  );
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      if (connection.source === connection.target) {
-        setErrorMessage("Error: Cannot connect a node to itself.");
-        return;
-      }
-      const sourceHasEdge = edges.some(edge => edge.source === connection.source && edge.sourceHandle === connection.sourceHandle);
-      if (sourceHasEdge) {
-        setErrorMessage("Error: A source handle can only have one outgoing connection.");
-        return;
-      }
-
-      if (wouldCreateCycle(edges, connection.source!, connection.target!)) {
-        setErrorMessage("Error: This connection would create a cycle in the flow.");
-        return;
-      }
-      setEdges((eds) => addEdge({
-        ...connection,
-        type: 'default',
-        markerEnd: { type: MarkerType.ArrowClosed, width: 30, height: 30 }
-      }, eds));
-      setErrorMessage(null); // clear error on successful connect
-    },
-    [edges, setEdges, setErrorMessage]
-  );
-
-  // Use onSelectionChange to update selectedNode for one-click editing
-  const onSelectionChange = useCallback((params: { nodes: Node[] }) => {
-    if (params.nodes.length > 0) {
-      // Find the full node object from the current nodes array
-      const node = nodes.find(n => n.id === params.nodes[0].id);
-      setSelectedNode(node || null);
-    } else {
-      setSelectedNode(null);
-    }
-  }, [setSelectedNode, nodes]);
-
-  return (
-    <div className="flex flex-grow">
-      <main className="flex-grow h-full" ref={props.reactFlowWrapper}>
-        <ReactFlow
-          nodes={props.nodes}
-          edges={props.edges}
-          onNodesChange={props.onNodesChange}
-          onEdgesChange={props.onEdgesChange}
-          onConnect={onConnect}
-          onPaneClick={props.onPaneClick}
-          onDragOver={props.onDragOver}
-          onDrop={onDrop}
-          nodeTypes={nodeTypes}
-          fitView
-          onSelectionChange={onSelectionChange}
-        >
-          <Background />
-          <Controls />
-        </ReactFlow>
-      </main>
-      <Sidebar
-        selectedNode={props.selectedNode}
-        updateNodeText={props.updateNodeText}
-        setSelectedNode={props.setSelectedNode}
-        onDeleteNode={props.onDeleteNode}
-      />
     </div>
   );
 }
