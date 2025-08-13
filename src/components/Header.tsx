@@ -5,9 +5,10 @@ type HeaderProps = {
   nodes: Node[];
   edges: Edge[];
   setErrorMessage: (msg: string | null) => void;
+  setSuccessMessage: (msg: string | null) => void;
 };
 
-export const Header = ({ nodes, edges, setErrorMessage }: HeaderProps) => {
+export const Header = ({ nodes, edges, setErrorMessage, setSuccessMessage }: HeaderProps) => {
   // This function contains the save validation logic
   const onSave = () => {
     // 1. Get all node IDs that are a target of an edge
@@ -19,9 +20,10 @@ export const Header = ({ nodes, edges, setErrorMessage }: HeaderProps) => {
     // 3. Check the validation condition
     if (nodes.length > 1 && nodesWithEmptyTargets.length > 1) {
       setErrorMessage('Error: Cannot save Flow. More than one node has an empty target handle.');
+      setSuccessMessage(null);
     } else {
       setErrorMessage(null);
-      // Optionally, you can show a green box for success, or just log
+      setSuccessMessage('Flow saved successfully!');
       console.log('Saved Flow:', { nodes, edges });
     }
   };

@@ -1,30 +1,3 @@
-// --- Cycle detection helper ---
-// Returns true if adding an edge from source to target would create a cycle
-function wouldCreateCycle(edges: Edge[], source: string, target: string): boolean {
-  // Build adjacency list
-  const adj: Record<string, string[]> = {};
-  edges.forEach(edge => {
-    if (!adj[edge.source]) adj[edge.source] = [];
-    adj[edge.source].push(edge.target);
-  });
-  // Add the new edge
-  if (!adj[source]) adj[source] = [];
-  adj[source].push(target);
-  // DFS to check for cycle
-  const visited = new Set<string>();
-  function dfs(node: string): boolean {
-    if (visited.has(node)) return true;
-    visited.add(node);
-    const neighbors = adj[node] || [];
-    for (const neighbor of neighbors) {
-      if (dfs(neighbor)) return true;
-    }
-    visited.delete(node);
-    return false;
-  }
-  return dfs(source);
-}
-
 import { useState, useRef, useCallback } from 'react';
 import { useReactFlow } from 'reactflow';
 import ReactFlow, {
@@ -57,12 +30,40 @@ const initialNodes: Node[] = [
   },
 ];
 
+// --- Cycle detection helper ---
+// Returns true if adding an edge from source to target would create a cycle
+function wouldCreateCycle(edges: Edge[], source: string, target: string): boolean {
+  // Build adjacency list
+  const adj: Record<string, string[]> = {};
+  edges.forEach(edge => {
+    if (!adj[edge.source]) adj[edge.source] = [];
+    adj[edge.source].push(edge.target);
+  });
+  // Add the new edge
+  if (!adj[source]) adj[source] = [];
+  adj[source].push(target);
+  // DFS to check for cycle
+  const visited = new Set<string>();
+  function dfs(node: string): boolean {
+    if (visited.has(node)) return true;
+    visited.add(node);
+    const neighbors = adj[node] || [];
+    for (const neighbor of neighbors) {
+      if (dfs(neighbor)) return true;
+    }
+    visited.delete(node);
+    return false;
+  }
+  return dfs(source);
+}
+
 function App() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -108,11 +109,17 @@ function App() {
 
   return (
     <div className="w-screen h-screen flex flex-col">
-      <Header nodes={nodes} edges={edges} setErrorMessage={setErrorMessage} />
+      <Header nodes={nodes} edges={edges} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage} />
       {errorMessage && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 text-center font-semibold">
           {errorMessage}
           <button className="ml-4 text-red-700 underline" onClick={() => setErrorMessage(null)}>Dismiss</button>
+        </div>
+      )}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 text-center font-semibold">
+          {successMessage}
+          <button className="ml-4 text-green-700 underline" onClick={() => setSuccessMessage(null)}>Dismiss</button>
         </div>
       )}
       <ReactFlowProvider>
